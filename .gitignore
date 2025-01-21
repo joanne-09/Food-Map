@@ -1,2 +1,2 @@
 src/api_key.js
-api_key.txt
+secrets.toml
