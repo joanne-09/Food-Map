@@ -9,7 +9,7 @@ with open("src/index.html") as file:
     html_code = file.read()
 # with open("./api_key.txt") as file:
 #     api_key = file.read()
-api_key = st.secrets["API_KEY"]["key"]
+api_key = "AIzaSyC_GHvukUyNPIfDg1_UetAJUW93x_2C0ww"
 html_code = html_code.replace("API_KEY", api_key)
 
 st.components.v1.html(html_code, height=600)
