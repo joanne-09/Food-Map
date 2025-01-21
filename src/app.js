@@ -1,47 +1,64 @@
-import {apikey} from './apikey.js';
+import { API_KEY } from "./api_key.js";
 
-function initMap() {
-    const map = new google.maps.Map(document.getElementById('map'), {
-        center: { lat: -34.397, lng: 150.644 },
-        zoom: 15,
+let map;
+
+async function initMap() {
+    const { Map, InfoWindow } = await google.maps.importLibrary("maps");
+    let center = new google.maps.LatLng(52.369358, 4.889258);
+
+    map = new Map(document.getElementById("map"), {
+        center: center,
+        zoom: 11,
     });
-
-    const service = new google.maps.places.PlacesService(map);
-
-    document.getElementById('search-button').addEventListener('click', () => {
-        const query = document.getElementById('search-input').value;
-        searchRestaurants(service, query);
-    });
+    nearbySearch();
 }
 
-function searchRestaurants(service, query) {
+async function nearbySearch() {
+    //@ts-ignore
+    const { Place, SearchNearbyRankPreference } = await google.maps.importLibrary(
+        "places",
+    );
+    const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+    // Restrict within the map viewport.
+    let center = new google.maps.LatLng(52.369358, 4.889258);
     const request = {
-        location: { lat: -34.397, lng: 150.644 }, // Replace with user's location
-        radius: '500',
-        type: ['restaurant'],
-        keyword: query,
+        // required parameters
+        fields: ["displayName", "location", "businessStatus"],
+        locationRestriction: {
+            center: center,
+            radius: 500,
+        },
+        // optional parameters
+        includedPrimaryTypes: ["restaurant"],
+        maxResultCount: 5,
+        rankPreference: SearchNearbyRankPreference.POPULARITY,
+        language: "en-US",
+        region: "us",
     };
+    //@ts-ignore
+    const { places } = await Place.searchNearby(request);
 
-    service.nearbySearch(request, (results, status) => {
-        if (status === google.maps.places.PlacesServiceStatus.OK) {
-            results.forEach(place => {
-                createMarker(place);
+    if (places.length) {
+        console.log(places);
+
+        const { LatLngBounds } = await google.maps.importLibrary("core");
+        const bounds = new LatLngBounds();
+
+        // Loop through and get all the results.
+        places.forEach((place) => {
+            const markerView = new AdvancedMarkerElement({
+                map,
+                position: place.location,
+                title: place.displayName,
             });
-        }
-    });
+
+            bounds.extend(place.location);
+            console.log(place);
+        });
+        map.fitBounds(bounds);
+    } else {
+        console.log("No results");
+    }
 }
 
-function createMarker(place) {
-    const marker = new google.maps.Marker({
-        map: map,
-        position: place.geometry.location,
-    });
-
-    const infowindow = new google.maps.InfoWindow();
-    google.maps.event.addListener(marker, 'click', () => {
-        infowindow.setContent(place.name);
-        infowindow.open(map, marker);
-    });
-}
-
-window.onload = initMap;
+initMap();

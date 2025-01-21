@@ -1,31 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Restaurant Finder</title>
-    <link rel="stylesheet" href="styles.css">
-    <style>
-        #map {
-            height: 400px;
-            width: 100%;
-        }
-    </style>
+    <title>Nearby Search</title>
+
+    <link rel="stylesheet" type="text/css" href="./styles.css" />
+    <script type="module" src="./app.js"></script>
 </head>
+
 <body>
-    <header>
-        <h1>Restaurant Finder</h1>
-        <input type="text" id="search" placeholder="Enter a location...">
-        <button id="find-restaurants">Find Restaurants</button>
-    </header>
-    <main>
-        <div id="map"></div>
-        <div id="results"></div>
-    </main>
-    <script src="api_key.js" type="module"></script>
-    <script src="app.js"></script>
-    <script async defer
-        src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places&callback=initMap">
+    <div id="map"></div>
+
+    <!-- API_KEY must be public on page -->
+    <script 
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC_GHvukUyNPIfDg1_UetAJUW93x_2C0ww&libraries=places&callback=initMap" 
+        async defer>
     </script>
 </body>
+
 </html>
