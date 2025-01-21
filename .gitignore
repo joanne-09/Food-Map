@@ -1,1 +1,2 @@
-src/api_key.js
+src/api_key.ts
+node_modules/

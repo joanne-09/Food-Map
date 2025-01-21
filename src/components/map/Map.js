@@ -1,13 +1,14 @@
 import React from 'react';
 import GoogleMapReact from 'google-map-react';
-import {API_KEY} from '../../api_key.js'
+import {API_KEY} from '../../api_key'
+import placeholder from '../../placeholder.svg'
 
 import {
     Icon,
     MapWrapper,
     MarkerWrapper,
     Text
-} from './mapSetting.js'
+} from './MapSetting'
 
 const RestaurantMarker = ({icon, text, showDetail, placeId}) => (
     <MarkerWrapper>
@@ -19,6 +20,7 @@ const RestaurantMarker = ({icon, text, showDetail, placeId}) => (
 
 const MyPositionMarker = ({text}) =>(
     <MarkerWrapper>
+      <Icon src={placeholder} />
       <Text>{text}</Text>
     </MarkerWrapper>
 )
@@ -61,3 +63,4 @@ const Map = ({places, defaultCenter, handleCenterChange, apiHasLoaded, showDetai
 
 
 export default Map
+  

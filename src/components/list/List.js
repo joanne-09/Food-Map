@@ -6,7 +6,7 @@ import {
     Name,
     ButtonStyle,
     ListMenuWrapper
-} from './listSetting.js'
+} from './ListSetting'
 
 const Cards = ({showDetail, icon, name}) => (
     <Card onClick={showDetail}>

@@ -9,7 +9,7 @@ import {
     Telphone,
     OpenTimeDetails,
     CloseDetail
-} from './detailsSetting.js'
+} from './DetailsSetting'
 
 const RestaurantDetails = ({details, closeDetail}) => {
     const {

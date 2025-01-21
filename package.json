@@ -1,24 +1,23 @@
 {
-  "name": "restaurant-finder",
+  "name": "my-map-app",
   "version": "1.0.0",
-  "description": "A web application to find restaurants using Google Maps API.",
-  "main": "src/app.js",
-  "scripts": {
-    "start": "live-server src",
-    "build": "echo 'Build step can be added here'"
-  },
+  "type": "module",
   "dependencies": {
-    "google-maps": "^0.1.0"
+    "@googlemaps/markerclusterer": "^2.5.1",
+    "@vis.gl/react-google-maps": "latest",
+    "@vitejs/plugin-react": "^4.3.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "live-server": "^1.2.1"
+    "@types/react": "^17.0.37",
+    "@types/react-dom": "^17.0.11",
+    "typescript": "^4.5.4",
+    "vite": "^5.0.4"
   },
-  "keywords": [
-    "restaurant",
-    "finder",
-    "google-maps",
-    "api"
-  ],
-  "author": "Your Name",
-  "license": "MIT"
+  "scripts": {
+    "start": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
+  }
 }
