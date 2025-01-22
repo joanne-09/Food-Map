@@ -1,5 +1,5 @@
 {
-  "name": "tmp",
+  "name": "food-map",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -34,5 +34,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "author": {
+    "name": "joanne-09",
+    "email": "joanne.zh2015@gmail.com"
   }
 }
