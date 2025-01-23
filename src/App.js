@@ -1,6 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { GoogleMap, useLoadScript, Marker, StandaloneSearchBox } from '@react-google-maps/api';
-import { API_KEY } from './api_key';
+import { GoogleMap, useJsApiLoader, Marker, StandaloneSearchBox } from '@react-google-maps/api';
 import './App.css';
 
 const libraries = ['places'];
@@ -14,8 +13,8 @@ const center = {
 };
 
 const App = () => {
-  const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: API_KEY,
+  const { isLoaded } = useJsApiLoader({
+    googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
     libraries,
   });
 
@@ -80,10 +79,6 @@ const App = () => {
       }
     });
   };
-
-  if (loadError) {
-    return <div>Error loading maps</div>;
-  }
 
   if (!isLoaded) {
     return <div>Loading maps</div>;

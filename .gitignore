@@ -8,7 +8,7 @@
 
 # production
 /build
-src/api_key.ts
+.env
 
 # misc
 .DS_Store

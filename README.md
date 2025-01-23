@@ -25,6 +25,7 @@ Food Map is a web application that allows users to search for restaurants within
     git clone https://github.com/joanne-09/food-map.git
     cd food-map
     ```
+
 2. Install the dependencies:
 
     ```sh
