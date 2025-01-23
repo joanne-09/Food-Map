@@ -38,5 +38,8 @@
   "author": {
     "name": "joanne-09",
     "email": "joanne.zh2015@gmail.com"
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
   }
 }

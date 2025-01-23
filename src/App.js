@@ -8,9 +8,10 @@ const mapContainerStyle = {
   height: '100%',
 };
 const center = {
-  lat: 7.2905715, // default latitude
-  lng: 80.6337262, // default longitude
+  lat: 24.8905715,
+  lng: 121.3337262,
 };
+const restaurant_marker_url = 'resource/marker-RATING.png';
 
 const App = () => {
   const { isLoaded } = useJsApiLoader({
@@ -19,8 +20,9 @@ const App = () => {
   });
 
   const [searchMarkers, setSearchMarkers] = useState([]);
+  const [nearbySearchMarkers, setNearbySearchMarkers] = useState([]);
   const [clickedMarker, setClickedMarker] = useState(null);
-  const [selectedPlace, setSelectedPlace] = useState(null);
+  const [selectedPlaces, setSelectedPlaces] = useState([]);
   const searchBoxRef = useRef(null);
   const mapRef = useRef(null);
   const placesServiceRef = useRef(null);
@@ -74,8 +76,12 @@ const App = () => {
         const newMarkers = results.map((place) => ({
           position: place.geometry.location,
           place,
+          rating: place.rating >= 4.5 ? restaurant_marker_url.replace('RATING', 'good') : 
+                  place.rating >= 3.8 ? restaurant_marker_url.replace('RATING', 'medium') : 
+                                        restaurant_marker_url.replace('RATING', 'bad'),
         }));
-        setSearchMarkers(newMarkers);
+        setNearbySearchMarkers(newMarkers);
+        setSelectedPlaces(results);
       }
     });
   };
@@ -87,22 +93,36 @@ const App = () => {
   return (
     <div className="App">
       <div className="sidebar">
-        <StandaloneSearchBox
-          onLoad={(ref) => (searchBoxRef.current = ref)}
-          onPlacesChanged={onPlacesChanged}
-        >
-          <input
-            type="text"
-            placeholder="Search for places"
-            className="search-box" // Apply the CSS class
-          />
-        </StandaloneSearchBox>
-        {selectedPlace && (
-          <div className="info-window">
-            <h2>{selectedPlace.name}</h2>
-            <p>{selectedPlace.formatted_address}</p>
-          </div>
-        )}
+        <div className="search-box-wrapper">
+          <StandaloneSearchBox
+            onLoad={(ref) => (searchBoxRef.current = ref)}
+            onPlacesChanged={onPlacesChanged}
+          >
+            <div className="search-box-container">
+              <img src="resource/search.png" alt="Search Icon" className="search-box-icon"/>
+              <input
+                type="text"
+                placeholder="Search for places"
+                className="search-box" // Apply the CSS class
+              />
+            </div>
+          </StandaloneSearchBox>
+        </div>
+        <div className="place-info-wrapper">
+          {selectedPlaces.length > 0 && (
+            <div>
+              {selectedPlaces
+                .sort((a, b) => b.rating - a.rating) // Sort by rating
+                .map((place, index) => (
+                  <div key={index} className="place-info">
+                    <h3>{place.name}</h3>
+                    <p>Rating: {place.rating || 'No rating available'}</p>
+                    <p>{place.formatted_address}</p>
+                  </div>
+                ))}
+            </div>
+          )}
+        </div>
       </div>
       <div className="map-container">
         <GoogleMap
@@ -121,15 +141,23 @@ const App = () => {
             <Marker
               key={index}
               position={marker.position}
-              onClick={() => setSelectedPlace(marker.place)}
             />
           ))}
           {clickedMarker && (
             <Marker
               position={clickedMarker.position}
-              onClick={() => setSelectedPlace(clickedMarker)}
             />
           )}
+          {nearbySearchMarkers.map((marker, index) => (
+            <Marker
+              key={index}
+              position={marker.position}
+              icon={{
+                url: marker.rating,
+                scaledSize: new window.google.maps.Size(32, 32),
+              }}
+            />
+          ))}
         </GoogleMap>
       </div>
     </div>
