@@ -8,8 +8,8 @@ const mapContainerStyle = {
   height: '100%',
 };
 const center = {
-  lat: 24.8905715,
-  lng: 121.3337262,
+  lat: 24.9605715,
+  lng: 121.5337262,
 };
 const restaurant_marker_url = 'resource/marker-RATING.png';
 
@@ -23,6 +23,7 @@ const App = () => {
   const [nearbySearchMarkers, setNearbySearchMarkers] = useState([]);
   const [clickedMarker, setClickedMarker] = useState(null);
   const [selectedPlaces, setSelectedPlaces] = useState([]);
+  const [isSelectionBarOpen, setIsSelectionBarOpen] = useState(false);
   const searchBoxRef = useRef(null);
   const mapRef = useRef(null);
   const placesServiceRef = useRef(null);
@@ -86,6 +87,10 @@ const App = () => {
     });
   };
 
+  const toggleSelectionBar = () => {
+    setIsSelectionBarOpen(!isSelectionBarOpen);
+  };
+
   if (!isLoaded) {
     return <div>Loading maps</div>;
   }
@@ -93,12 +98,12 @@ const App = () => {
   return (
     <div className="App">
       <div className="sidebar">
-        <div className="search-box-wrapper">
+        <div className="search-box-container">
           <StandaloneSearchBox
             onLoad={(ref) => (searchBoxRef.current = ref)}
             onPlacesChanged={onPlacesChanged}
           >
-            <div className="search-box-container">
+            <div className="search-box-wrapper">
               <img src="resource/search.png" alt="Search Icon" className="search-box-icon"/>
               <input
                 type="text"
@@ -115,9 +120,12 @@ const App = () => {
                 .sort((a, b) => b.rating - a.rating) // Sort by rating
                 .map((place, index) => (
                   <div key={index} className="place-info">
-                    <h3>{place.name}</h3>
-                    <p>Rating: {place.rating || 'No rating available'}</p>
-                    <p>{place.formatted_address}</p>
+                    <img src={place.photos ? place.photos[0].getUrl() : 'resource/search.png'} alt={place.name} />
+                    <div>
+                      <h3>{place.name}</h3>
+                      <p>Rating: {place.rating || 'No rating available'}</p>
+                      <p>{place.formatted_address}</p>
+                    </div>
                   </div>
                 ))}
             </div>
@@ -127,7 +135,7 @@ const App = () => {
       <div className="map-container">
         <GoogleMap
           mapContainerStyle={mapContainerStyle}
-          zoom={10}
+          zoom={11}
           center={center}
           onLoad={(map) => {
             mapRef.current = map;
@@ -160,6 +168,18 @@ const App = () => {
           ))}
         </GoogleMap>
       </div>
+      <div className={`selection-bar ${isSelectionBarOpen ? 'open' : ''}`}>
+        <div className="selection-bar-content">
+          <h2>Selection Bar</h2>
+          <p>Content...</p>
+        </div>
+      </div>
+      <img
+        src="resource/menu.png"
+        alt="Menu"
+        className="selection-bar-icon"
+        onClick={toggleSelectionBar}
+      />
     </div>
   );
 };

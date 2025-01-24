@@ -1,6 +1,7 @@
 .App {
   display: flex;
   height: 100vh;
+  position: relative;
 }
 
 .sidebar {
@@ -20,13 +21,14 @@
 .map-container {
   flex-grow: 1; /* allow the map to grow */
   height: 100%;
-}
-
-.search-box-wrapper {
-  flex-shrink: 0;
+  z-index: 50;
 }
 
 .search-box-container {
+  flex-shrink: 0;
+}
+
+.search-box-wrapper {
   position: relative;
   width: 100%;
 }
@@ -68,4 +70,68 @@
   border-radius: 5px;
   background-color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.place-info img {
+  width: 50px;
+  height: 50px;
+  border-radius: 5px;
+  margin-right: 10px;
+}
+
+.place-info h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.place-info p {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #555;
+}
+
+.selection-bar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 250px;
+  height: 100%;
+  background-color: #fff;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 1;
+}
+
+.selection-bar.open {
+  transform: translateZ(10px);
+  opacity: 1;
+  z-index: 100;
+}
+
+.selection-bar-content {
+  padding: 20px;
+}
+
+.selection-bar-icon {
+  position: absolute;
+  top: 60px;
+  padding: 5px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  background-color: #fff;
+  border-radius: 5px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  z-index: 101;
+}
+
+.selection-bar-icon:hover {
+  background-color: #f0f0f0;
+  top: 57px;
+  right: 7px;
+  width: 36px;
+  height: 36px;
+  transition: 0.3s ease;
 }
