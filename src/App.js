@@ -11,10 +11,18 @@ const center = {
   lat: 24.9605715,
   lng: 121.5337262,
 };
+const placeTypes = [
+  { value: 'restaurant', label: 'Restaurant' },
+  { value: 'cafe', label: 'Cafe' },
+  { value: 'bar', label: 'Bar' },
+  { value: 'bakery', label: 'Bakery' },
+  { value: 'meal_delivery', label: 'Meal Delivery' },
+  { value: 'meal_takeaway', label: 'Meal Takeaway' },
+];
 const restaurant_marker_url = 'resource/marker-RATING.png';
 
 const App = () => {
-  const { isLoaded } = useJsApiLoader({
+  const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
     libraries,
   });
@@ -24,72 +32,98 @@ const App = () => {
   const [clickedMarker, setClickedMarker] = useState(null);
   const [selectedPlaces, setSelectedPlaces] = useState([]);
   const [isSelectionBarOpen, setIsSelectionBarOpen] = useState(false);
+  const [placeType, setPlaceType] = useState('restaurant');
   const searchBoxRef = useRef(null);
   const mapRef = useRef(null);
   const placesServiceRef = useRef(null);
 
   const onPlacesChanged = () => {
-    const places = searchBoxRef.current.getPlaces();
-    if (!places || places.length === 0) {
-      return;
-    }
-    const newMarkers = places.map((place) => ({
-      position: place.geometry.location,
-      place,
-    }));
-    setSearchMarkers(newMarkers);
-    if (places.length > 0) {
-      const bounds = new window.google.maps.LatLngBounds();
-      places.forEach((place) => {
-        if (place.geometry.viewport) {
-          bounds.union(place.geometry.viewport);
-        } else {
-          bounds.extend(place.geometry.location);
-        }
-      });
-      mapRef.current.fitBounds(bounds);
+    try {
+      const places = searchBoxRef.current.getPlaces();
+      if (!places || places.length === 0) {
+        return;
+      }
+      const newMarkers = places.map((place) => ({
+        position: place.geometry.location,
+        place,
+      }));
+      setSearchMarkers(newMarkers);
+      if (places.length > 0) {
+        const bounds = new window.google.maps.LatLngBounds();
+        places.forEach((place) => {
+          if (place.geometry.viewport) {
+            bounds.union(place.geometry.viewport);
+          } else {
+            bounds.extend(place.geometry.location);
+          }
+        });
+        mapRef.current.fitBounds(bounds);
+      } 
+    } catch (error) {
+      console.error('Error adding search markers', error);
     }
   };
 
   const onMapClick = (event) => {
-    const newMarker = {
-      position: {
-        lat: event.latLng.lat(),
-        lng: event.latLng.lng(),
-      },
-    };
-    setClickedMarker(newMarker);
-    setSearchMarkers([]); // Clear search markers when a map click occurs
-    mapRef.current.panTo(newMarker.position);
+    try {
+      const newMarker = {
+        position: {
+          lat: event.latLng.lat(),
+          lng: event.latLng.lng(),
+        },
+      };
+      setClickedMarker(newMarker);
+      setSearchMarkers([]); // Clear search markers when a map click occurs
+      mapRef.current.panTo(newMarker.position);
+    } catch (error) {
+      console.error('Error adding clicked marker', error);
+    }
   };
 
   const onBoundsChanged = () => {
-    if (!placesServiceRef.current || !mapRef.current) return;
+    try {
+      if (!placesServiceRef.current || !mapRef.current) return;
 
-    const bounds = mapRef.current.getBounds();
-    const request = {
-      bounds: bounds,
-      type: 'restaurant',
-    };
+      const bounds = mapRef.current.getBounds();
+      const request = {
+        bounds: bounds,
+        type: [placeType],
+      };
 
-    placesServiceRef.current.nearbySearch(request, (results, status) => {
-      if (status === window.google.maps.places.PlacesServiceStatus.OK) {
-        const newMarkers = results.map((place) => ({
-          position: place.geometry.location,
-          place,
-          rating: place.rating >= 4.5 ? restaurant_marker_url.replace('RATING', 'good') : 
-                  place.rating >= 3.8 ? restaurant_marker_url.replace('RATING', 'medium') : 
-                                        restaurant_marker_url.replace('RATING', 'bad'),
-        }));
-        setNearbySearchMarkers(newMarkers);
-        setSelectedPlaces(results);
-      }
-    });
+      placesServiceRef.current.nearbySearch(request, (results, status) => {
+        if (status === window.google.maps.places.PlacesServiceStatus.OK) {
+          const openTodayResults = results.filter(place => place.opening_hours && place.opening_hours.isOpen());
+
+          const newMarkers = openTodayResults.map((place) => ({
+            position: place.geometry.location,
+            place,
+            rating: place.rating >= 4.5 ? restaurant_marker_url.replace('RATING', 'good') :
+                    place.rating >= 3.8 ? restaurant_marker_url.replace('RATING', 'medium') :
+                                          restaurant_marker_url.replace('RATING', 'bad'),
+          }));
+          setNearbySearchMarkers(newMarkers);
+          setSelectedPlaces(openTodayResults);
+        } else {
+          console.error('Nearby search request failed', status);
+        }
+      });
+    } catch (error) {
+      console.error('Error in onBoundsChanged:', error);
+    }
   };
 
   const toggleSelectionBar = () => {
     setIsSelectionBarOpen(!isSelectionBarOpen);
   };
+
+  const searchTypeChange = (event) => {
+    setPlaceType(event.target.value);
+    onBoundsChanged();
+  };
+
+  if (loadError) {
+    return <div>Error loading maps</div>;
+  }
 
   if (!isLoaded) {
     return <div>Loading maps</div>;
@@ -124,7 +158,6 @@ const App = () => {
                     <div>
                       <h3>{place.name}</h3>
                       <p>Rating: {place.rating || 'No rating available'}</p>
-                      <p>{place.formatted_address}</p>
                     </div>
                   </div>
                 ))}
@@ -171,7 +204,14 @@ const App = () => {
       <div className={`selection-bar ${isSelectionBarOpen ? 'open' : ''}`}>
         <div className="selection-bar-content">
           <h2>Selection Bar</h2>
-          <p>Content...</p>
+          <label htmlFor="place-type">Select Place Type:</label>
+          <select id="place-type" value={placeType} onChange={searchTypeChange}>
+            {placeTypes.map((type) => (
+              <option key={type.value} value={type.value}>
+                {type.label}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
       <img
