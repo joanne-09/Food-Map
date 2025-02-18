@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { GoogleMap, useJsApiLoader, Marker, StandaloneSearchBox } from '@react-google-maps/api';
+import Select from 'react-select';
 import './App.css';
 
 const libraries = ['places'];
@@ -24,7 +25,7 @@ const restaurant_marker_url = 'resource/marker-RATING.png';
 const App = () => {
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
-    libraries,
+    libraries: libraries,
   });
 
   const [searchMarkers, setSearchMarkers] = useState([]);
@@ -32,7 +33,7 @@ const App = () => {
   const [clickedMarker, setClickedMarker] = useState(null);
   const [selectedPlaces, setSelectedPlaces] = useState([]);
   const [isSelectionBarOpen, setIsSelectionBarOpen] = useState(false);
-  const [placeType, setPlaceType] = useState('restaurant');
+  const [placeType, setPlaceType] = useState(['restaurant']);
   const searchBoxRef = useRef(null);
   const mapRef = useRef(null);
   const placesServiceRef = useRef(null);
@@ -87,12 +88,17 @@ const App = () => {
       const bounds = mapRef.current.getBounds();
       const request = {
         bounds: bounds,
-        type: [placeType],
+        type: selectedPlaces.map(type => type.value),
       };
 
       placesServiceRef.current.nearbySearch(request, (results, status) => {
         if (status === window.google.maps.places.PlacesServiceStatus.OK) {
-          const openTodayResults = results.filter(place => place.opening_hours && place.opening_hours.isOpen());
+          const today = new Date().getDay();
+          const openTodayResults = results.filter(place => 
+            place.opening_hours && 
+            place.opening_hours.weekday_text &&
+            place.opening_hours.weekday_text[today]
+          );
 
           const newMarkers = openTodayResults.map((place) => ({
             position: place.geometry.location,
@@ -111,13 +117,13 @@ const App = () => {
       console.error('Error in onBoundsChanged:', error);
     }
   };
-
+  
   const toggleSelectionBar = () => {
     setIsSelectionBarOpen(!isSelectionBarOpen);
   };
 
-  const searchTypeChange = (event) => {
-    setPlaceType(event.target.value);
+  const searchTypeChange = (options) => {
+    setPlaceType(options);
     onBoundsChanged();
   };
 
@@ -205,13 +211,14 @@ const App = () => {
         <div className="selection-bar-content">
           <h2>Selection Bar</h2>
           <label htmlFor="place-type">Select Place Type:</label>
-          <select id="place-type" value={placeType} onChange={searchTypeChange}>
-            {placeTypes.map((type) => (
-              <option key={type.value} value={type.value}>
-                {type.label}
-              </option>
-            ))}
-          </select>
+          <Select
+            id="place-type"
+            isMulti 
+            value={placeType}
+            onChange={searchTypeChange}
+            options={placeTypes}
+            classNamePrefix="select-place"
+          />
         </div>
       </div>
       <img

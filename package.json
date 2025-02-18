@@ -4,10 +4,12 @@
   "private": true,
   "dependencies": {
     "@react-google-maps/api": "^2.20.5",
+    "@types/google.maps": "^3.58.1",
     "cra-template": "1.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-scripts": "5.0.1",
+    "react-select": "^5.10.0",
     "use-places-autocomplete": "^4.0.1",
     "web-vitals": "^4.2.4"
   },

@@ -137,3 +137,41 @@
   height: 36px;
   transition: 0.3s ease;
 }
+
+.select-place__control {
+  background-color: #f0f0f0;
+  border-color: #ccc;
+  min-height: 40px;
+  height: 40px;
+  box-shadow: none;
+}
+
+.select-place__value-container {
+  height: 40px;
+  padding: 0 6px;
+}
+
+.select-place__input {
+  margin: 0px;
+}
+
+.select-place__indicator-separator {
+  display: none;
+}
+
+.select-place__indicators {
+  height: 40px;
+}
+
+.select-place__menu {
+  background-color: #fff;
+  border: 1px solid #ccc;
+}
+
+.select-place__option--is-focused {
+  background-color: #e6e6e6;
+}
+
+.select-place__option--is-selected {
+  background-color: #ccc;
+}
